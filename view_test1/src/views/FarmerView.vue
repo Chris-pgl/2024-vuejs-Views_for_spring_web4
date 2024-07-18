@@ -16,7 +16,14 @@
       </li>
     </ul>
 
-    <a href="http://localhost:5173">Back to Home</a>
+
+    
+    
+
+   
+
+   <!-- <a href="http://localhost:5173">Back to Home</a> -->
+    <RouterLink to="/"> Back to Home 💫 </RouterLink>
 </div>
 </template>
 

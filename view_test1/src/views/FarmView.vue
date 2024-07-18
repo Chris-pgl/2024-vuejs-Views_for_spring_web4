@@ -1,23 +1,38 @@
 <template>
-   <div class="container">
+   <div v-if="!newFarmShow" class="container">
       <h1>Farms:</h1>
-      <div class="controls">
-        <!--Agiungo un bottone per fare un get add e un update alla pagina-->
-        <a href="">Aggiungi Farm🌿</a>   <!-- tolta la chiamata a http://localhost:8080/farm/add-->
-        <button @click="addFarm" class="farm_button">Add Farm</button>
-      </div>
-
-      <ul class="farm-list" >
-        <li v-for="farm in farms" :key="farm.id" class="farm-item">
-          {{ farm.name }}
-          {{ farm.city }}
-        </li>
-      </ul>
-
       
-
-      <a href="http://localhost:5173">Back to Home 🥀</a>
+        <!--Agiungo un bottone per fare un get add e un update alla pagina-->
+        <!-- <a href="">Aggiungi Farm🌿</a>    tolta la chiamata a http://localhost:8080/farm/add-->
+        <button @click="addFarm" class="farm_button">Add Farm tramite /add🌿</button>
+        <br />
+        <button @click="toggleNewFarmShow"> add new Farm🌿 </button>
+        <ul class="farm-list" >
+          <li v-for="(farm, ind) in farms" :key="farm.id" class="farm-item">
+            [{{ ind + 1 }}] {{ farm.name }}: {{ farm.city }}
+          </li>
+        </ul>
+        <p v-if="saveResVis">
+          {{ saveRes }}
+        </p>
     </div>
+
+    <div v-else>
+      <h1>New Farm🌿:</h1>
+      <label>Name</label>
+      <br />
+      <input type="text" v-model="newFarmData.name" />
+      <br />
+      <label>City</label>
+      <br />
+      <input type="text" v-model="newFarmData.city" />
+      <br />
+      <button @click="toggleNewFarmShow">CANCEL</button>
+      <button @click="saveNewFarm">SAVE</button>
+    </div>
+
+    
+     <RouterLink to="/"> Back to Home 🥀</RouterLink>
 </template>
 
 <script setup>
@@ -25,12 +40,31 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 
+
+
+
 //VARIABILI
 const farms = ref([])
 
+// eslint-disable-next-line no-unused-vars
+const saveResVis = ref(false)
+
+// eslint-disable-next-line no-unused-vars
+const saveRes = ref("")
+
+// eslint-disable-next-line no-unused-vars
+const newFarmShow = ref(false)
+
+// eslint-disable-next-line no-unused-vars
+const newFarmData = ref({
+  name: ' ',
+  city: ' '
+})
+//add
 const addFarm = () => {
   axios.get('http://localhost:8080/farm/add').then(updateData)
 }
+//read all
 const updateData = () => {
   axios
     .get('http://localhost:8080/farm/all')
@@ -41,7 +75,34 @@ const updateData = () => {
       console.log('Error')
     })
 }
-onMounted(updateData)
+
+//per salvare
+const toggleNewFarmShow = () => {
+  newFarmShow.value = !newFarmShow.value
+  console.log('newFarmShow:' + newFarmShow.value)
+}
+
+//create
+const saveNewFarm = () => {
+  axios.post("http://localhost:8080/farm/create", newFarmData.value)
+  .then((res) => {
+    const savedFarm = res.data
+
+    farms.value.push(savedFarm)
+    newFarmData.value = {
+      name: ' ',
+      city: ' '
+    }
+
+    saveRes.value = 'update'
+    saveResVis.value = true
+  })
+}
+
+
+onMounted(() => {
+  updateData()
+})
 
 /* Questa era una chiamata sola alla het all- Sopra abbiamo un add e get all 
 onMounted(() => {
