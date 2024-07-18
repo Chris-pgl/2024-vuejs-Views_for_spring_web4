@@ -96,6 +96,8 @@ const saveNewFarm = () => {
 
     saveRes.value = 'update'
     saveResVis.value = true
+    toggleNewFarmShow()
+    updateData()
   })
 }
 
