@@ -1,17 +1,23 @@
 <template>
-  <h1>Farmers:</h1>
-  <!-- chiamata all'api per aggiunta di farmer-->
-  <a href="http://localhost:8080/farmer/add">Aggiungi Farmer🤠</a>
-  <button @click="addFarmer">Add Test Data</button>
-  <ul>
-    <li v-for="farmer in farmers" :key="farmer.id">
-      {{ farmer.name }}
-      {{ farmer.surname }}
-      {{ farmer.age }}
-    </li>
-  </ul>
+  <div class="container">
+    <h1>Farmers:</h1>
+    <div class="button_div">
+      <!-- chiamata all'api per aggiunta di farmer-->
+      <a href="">Aggiungi Farmer🤠</a> <!-- tolta la chiamata a -->
+      <button @click="addFarmer" class="farmer_button">Add Farmers</button>
+    </div>
+    
+    
+    <ul class="farmers_list">
+      <li v-for="farmer in farmers" :key="farmer.id" class="farmer-item">
+        {{ farmer.name }}
+        {{ farmer.surname }}
+        {{ farmer.age }}
+      </li>
+    </ul>
 
-  <a href="http://localhost:5173">Back to Home</a>
+    <a href="http://localhost:5173">Back to Home</a>
+</div>
 </template>
 
 <script setup>
@@ -62,3 +68,53 @@ onMounted(() => {
 })
 */
 </script>
+
+
+
+<style>
+
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button_div {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+
+.farmer_button{
+  padding: 10px 20px; /* Dimensioni fisse per il bottone */
+  font-size: 16px;    /* Dimensione del testo fissa */
+  background-color: #28a745; /* Colore di sfondo */
+  color: white; /* Colore del testo */
+  border: none; /* Rimuove i bordi */
+  border-radius: 5px; /* Aggiunge bordi arrotondati */
+  cursor: pointer; /* Cambia il cursore quando si passa sopra */
+  flex-shrink: 0; /* Impedisce al bottone di ridimensionarsi */
+}
+
+.farmer_button:hover {
+  background-color: #2e7d32;
+}
+
+.farmers_list {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+  max-width: 600px;
+}
+
+.farmer-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+</style>
