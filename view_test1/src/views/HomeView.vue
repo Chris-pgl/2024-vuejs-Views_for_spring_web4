@@ -21,14 +21,9 @@
   
   <RouterLink to="/farmer">Farmers🤠🌿</RouterLink>
 
-  <!-- chiamata all'api per aggiunta di farmer-->
-  <a href="http://localhost:8080/farmer/add">Aggiungi Farmer🤠</a>
+  <RouterLink to="/farm">Farms⛩️🌿</RouterLink>
 
-
-
-  <RouterLink to="/farm">Farm⛩️🌿</RouterLink>
-
-  <a href="http://localhost:8080/farm/add">Aggiungi Farm🌿</a>
+ 
 
 
   

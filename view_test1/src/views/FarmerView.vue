@@ -1,5 +1,7 @@
 <template>
   <h1>Farmers:</h1>
+  <!-- chiamata all'api per aggiunta di farmer-->
+  <a href="http://localhost:8080/farmer/add">Aggiungi Farmer🤠</a>
   <button @click="addFarmer">Add Test Data</button>
   <ul>
     <li v-for="farmer in farmers" :key="farmer.id">

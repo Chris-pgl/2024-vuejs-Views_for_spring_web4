@@ -1,6 +1,7 @@
 <template>
   <h1>Farms:</h1>
   <!--Agiungo un bottone per fare un get add e un update alla pagina-->
+  <a href="http://localhost:8080/farm/add">Aggiungi Farm🌿</a>
   <button @click="addFarm">Add Farm</button>
 
   <ul>
@@ -9,6 +10,8 @@
       {{ farm.city }}
     </li>
   </ul>
+
+  
 
   <a href="http://localhost:5173">Back to Home 🥀</a>
 </template>
