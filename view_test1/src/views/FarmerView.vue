@@ -1,30 +1,77 @@
 <template>
-  <div class="container">
-    <h1>Farmers:</h1>
-    <div class="button_div">
-      <!-- chiamata all'api per aggiunta di farmer-->
-      <a href="">Aggiungi Farmer🤠</a> <!-- tolta la chiamata a -->
-      <button @click="addFarmer" class="farmer_button">Add Farmers</button>
-    </div>
-    
-    
-    <ul class="farmers_list">
+  <div v-if="!newFarmerShow && !updateFarmerShow" class="container">
+    <h1>Farmers:</h1>  
+    <button @click="addFarmer" class="farmer_button">/Add Farmers🤠</button>
+    <button @click="toggleNewFarmerShow">Add new Farmer🤠</button>
+     <ul class="farmers_list">
       <li v-for="farmer in farmers" :key="farmer.id" class="farmer-item">
         {{ farmer.name }}
         {{ farmer.surname }}
         {{ farmer.age }}
+        <br />
+        {{ farmer.farm.name }} ({{ farmer.farm.city }})
+        <br />
+        <button @click="editFarmer(farmer.id)">Edit</button>
+        <button @click="deleteFarmer(farmer.id)">Delete</button>
       </li>
     </ul>
-
-
-    
-    
-
-   
-
-   <!-- <a href="http://localhost:5173">Back to Home</a> -->
-    <RouterLink to="/"> Back to Home 💫 </RouterLink>
 </div>
+
+
+<RouterLink to="/"> Back to Home 💫 </RouterLink>
+
+
+<div v-if="newFarmerShow">
+  <h1>New Farmer</h1>
+  <label>Name</label>
+  <br />
+  <input type="text" v-model="newFarmerData.name" />
+  <br />    
+  <label>Surname</label>
+  <br />
+  <input type="text" v-model="newFarmerData.surname" />
+  <br />
+  <label>Age</label>
+  <br />
+  <input type="number" v-model="newFarmerData.age" />
+  <br />
+  <label>Farm</label>
+  <br />
+  <select v-model="newFarmerData.farmId">
+    <option v-for="farm in farms" :key="farm.id" :value="farm.id">
+      {{ farm.name }} ({{ farm.city }})
+    </option>
+  </select>
+  <br />
+  <button @click="toggleNewFarmerShow">CANCEL</button>
+  <button @click="saveNewFarmer">SAVE</button>
+</div>
+
+<div v-if="updateFarmerShow">
+    <h1>Update Farmer</h1>
+    <label>Name</label>
+    <br />
+    <input type="text" v-model="updateFarmerData.name" />
+    <br />
+    <label>Surname</label>
+    <br />
+    <input type="text" v-model="updateFarmerData.surname" />
+    <br />
+    <label>Age</label>
+    <br />
+    <input type="number" v-model="updateFarmerData.age" />
+    <br />
+    <label>Farm</label>
+    <br />
+    <select v-model="updateFarmerData.farmId">
+      <option v-for="farm in farms" :key="farm.id" :value="farm.id">
+        {{ farm.name }} ({{ farm.city }})
+      </option>
+    </select>
+    <br />
+    <button @click="toggleUpdateFarmerShow">CANCEL</button>
+    <button @click="updateFarmer">SAVE</button>
+  </div>
 </template>
 
 <script setup>
@@ -33,7 +80,22 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 
 //VARIABILI
+const newFarmerShow = ref(false)
+
+const updateFarmerShow = ref(false)
+
+const farms = ref([])
+
 const farmers = ref([])
+
+const newFarmerData = ref({
+  name: '',
+  surname: '',
+  age: 0,
+  farmId: 0
+})
+
+const updateFarmerData = ref({})
 
 //EVENTI
 const addFarmer = () => {
@@ -48,32 +110,91 @@ const updateData = () => {
     .catch(() => {
       console.log('Errore nella richiesta')
     })
+    axios.get("http://localhost:8080/farm/all").then((res) => {
+      farms.value = res.data
+    })
 }
-onMounted(updateData)
-//mentre col metodo di sopra facciamo sia un get add che un aggiornamento
-//-----------------------------------------------------------------------------------
-//con il metodo sotto
-//Facciamo una get al back_end all'endpoint che vogliamo
-/*   
-onMounted(() => {
-  axios
-    .get('http://localhost:8080/farmer/all')
-    //Se va bene continua e mi torna una res
-    .then((res) => {
-      //console.log(res.data) <-- così torniamo il dato
 
-      //Ma anche così possiamo tornare il dato e leggerli meglio con JSON.strinify()data, null, 2)
-      console.log(JSON.stringify(res.data, null, 2))
-      //questa è costum, a secondo il data e la struttura dati
-      farmers.value = res.data
+// FUNCTIONS
+const toggleNewFarmerShow = () => {
+  newFarmerShow.value = !newFarmerShow.value
+}
+const toggleUpdateFarmerShow = () => {
+  updateFarmerShow.value = !updateFarmerShow.value
+}
+
+const saveNewFarmer = () => {
+  console.log(JSON.stringify(newFarmerData.value, null, 2))
+
+  axios
+    .post('http://localhost:8080/farmer/create', newFarmerData.value)
+    .then((res) => {
+      const savedFarmer = res.data
+
+      farmers.value.push(savedFarmer)
+
+      newFarmerData.value = {
+        name: '',
+        surname: '',
+        age: 0,
+        farmId: 0
+      }
+
+      toggleNewFarmerShow()
     })
-    //se va male mi chiamo un errore
-    // eslint-disable-next-line no-unused-vars
-    .catch((error) => {
-      console.log('error!!!!!!!!!')
+    .catch((err) => {
+      console.log('Error: ' + err)
     })
-})
-*/
+}
+
+const editFarmer = (id) => {
+  for (let x = 0; x < farmers.value.length; x++) {
+    const farmer = farmers.value[x]
+
+    if (farmer.id === id) {
+      updateFarmerData.value = farmer
+      console.log('udateFarmerData: ' + JSON.stringify(updateFarmerData.value, null, 2))
+
+      updateFarmerData.value.farmId = farmer.farm.id
+      break
+    }
+  }
+
+  console.log('udateFarmerData: ' + JSON.stringify(updateFarmerData.value, null, 2))
+
+  updateFarmerShow.value = true
+}
+const updateFarmer = () => {
+  const axiosData = {
+    name: updateFarmerData.value.name,
+    surname: updateFarmerData.value.surname,
+    age: updateFarmerData.value.age,
+    farmId: updateFarmerData.value.farmId
+  }
+
+  axios
+    .patch('http://localhost:8080/farmer/update/' + updateFarmerData.value.id, axiosData)
+    .then(() => {
+      updateData()
+      updateFarmerShow.value = false
+    })
+    .catch((err) => {
+      console.log('Error: ' + err)
+    })
+}
+
+const deleteFarmer = (id) => {
+  axios
+    .delete('http://localhost:8080/farmer/delete/' + id)
+    .then(() => {
+      farmers.value = farmers.value.filter((farmer) => farmer.id !== id)
+    })
+    .catch((err) => {
+      console.log('Error: ' + err)
+    })
+  }
+
+onMounted(updateData)
 </script>
 
 
