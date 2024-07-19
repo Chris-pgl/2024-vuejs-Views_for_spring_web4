@@ -5,49 +5,52 @@
     <button @click="toggleNewFarmerShow">Add new Farmer🤠</button>
      <ul class="farmers_list">
       <li v-for="farmer in farmers" :key="farmer.id" class="farmer-item">
-        {{ farmer.name }}
-        {{ farmer.surname }}
-        {{ farmer.age }}
-        <br />
-        {{ farmer.farm.name }} ({{ farmer.farm.city }})
-        <br />
-        <button @click="editFarmer(farmer.id)">Edit</button>
-        <button @click="deleteFarmer(farmer.id)">Delete</button>
+        <div v-if="farmer && farmer.farm">
+          {{ farmer.name }}
+          {{ farmer.surname }}
+          {{ farmer.age }}
+          <br />
+          {{ farmer.farm.name }} ({{ farmer.farm.city }})
+          <br />
+          <button @click="editFarmer(farmer.id)">Edit</button>
+          <button @click="deleteFarmer(farmer.id)">Delete</button>
+        </div>
+        <div v-else>
+          <p>Farmer data is incomplete.</p>
+        </div>
       </li>
     </ul>
-</div>
+  </div>
 
+  <RouterLink to="/"> Back to Home 💫 </RouterLink>
 
-<RouterLink to="/"> Back to Home 💫 </RouterLink>
+  <div v-if="newFarmerShow">
+    <h1>New Farmer</h1>
+    <label>Name</label>
+    <br />
+    <input type="text" v-model="newFarmerData.name" />
+    <br />    
+    <label>Surname</label>
+    <br />
+    <input type="text" v-model="newFarmerData.surname" />
+    <br />
+    <label>Age</label>
+    <br />
+    <input type="number" v-model="newFarmerData.age" />
+    <br />
+    <label>Farm</label>
+    <br />
+    <select v-model="newFarmerData.farmId">
+      <option v-for="farm in farms" :key="farm.id" :value="farm.id">
+        {{ farm.name }} ({{ farm.city }})
+      </option>
+    </select>
+    <br />
+    <button @click="toggleNewFarmerShow">CANCEL</button>
+    <button @click="saveNewFarmer">SAVE</button>
+  </div>
 
-
-<div v-if="newFarmerShow">
-  <h1>New Farmer</h1>
-  <label>Name</label>
-  <br />
-  <input type="text" v-model="newFarmerData.name" />
-  <br />    
-  <label>Surname</label>
-  <br />
-  <input type="text" v-model="newFarmerData.surname" />
-  <br />
-  <label>Age</label>
-  <br />
-  <input type="number" v-model="newFarmerData.age" />
-  <br />
-  <label>Farm</label>
-  <br />
-  <select v-model="newFarmerData.farmId">
-    <option v-for="farm in farms" :key="farm.id" :value="farm.id">
-      {{ farm.name }} ({{ farm.city }})
-    </option>
-  </select>
-  <br />
-  <button @click="toggleNewFarmerShow">CANCEL</button>
-  <button @click="saveNewFarmer">SAVE</button>
-</div>
-
-<div v-if="updateFarmerShow">
+  <div v-if="updateFarmerShow">
     <h1>Update Farmer</h1>
     <label>Name</label>
     <br />
@@ -79,13 +82,10 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 
-//VARIABILI
+// VARIABILI
 const newFarmerShow = ref(false)
-
 const updateFarmerShow = ref(false)
-
 const farms = ref([])
-
 const farmers = ref([])
 
 const newFarmerData = ref({
@@ -97,10 +97,11 @@ const newFarmerData = ref({
 
 const updateFarmerData = ref({})
 
-//EVENTI
+// EVENTI
 const addFarmer = () => {
   axios.get('http://localhost:8080/farmer/add').then(updateData)
 }
+
 const updateData = () => {
   axios
     .get('http://localhost:8080/farmer/all')
@@ -110,20 +111,26 @@ const updateData = () => {
     .catch(() => {
       console.log('Errore nella richiesta')
     })
-    axios.get("http://localhost:8080/farm/all").then((res) => {
-      farms.value = res.data
-    })
+  axios.get("http://localhost:8080/farm/all").then((res) => {
+    farms.value = res.data
+  })
 }
 
 // FUNCTIONS
 const toggleNewFarmerShow = () => {
   newFarmerShow.value = !newFarmerShow.value
 }
+
 const toggleUpdateFarmerShow = () => {
   updateFarmerShow.value = !updateFarmerShow.value
 }
 
 const saveNewFarmer = () => {
+  if (!newFarmerData.value.farmId) {
+    console.log("Please select a farm for the new farmer.")
+    return
+  }
+
   console.log(JSON.stringify(newFarmerData.value, null, 2))
 
   axios
@@ -153,17 +160,18 @@ const editFarmer = (id) => {
 
     if (farmer.id === id) {
       updateFarmerData.value = farmer
-      console.log('udateFarmerData: ' + JSON.stringify(updateFarmerData.value, null, 2))
+      console.log('updateFarmerData: ' + JSON.stringify(updateFarmerData.value, null, 2))
 
       updateFarmerData.value.farmId = farmer.farm.id
       break
     }
   }
 
-  console.log('udateFarmerData: ' + JSON.stringify(updateFarmerData.value, null, 2))
+  console.log('updateFarmerData: ' + JSON.stringify(updateFarmerData.value, null, 2))
 
   updateFarmerShow.value = true
 }
+
 const updateFarmer = () => {
   const axiosData = {
     name: updateFarmerData.value.name,
@@ -192,7 +200,7 @@ const deleteFarmer = (id) => {
     .catch((err) => {
       console.log('Error: ' + err)
     })
-  }
+}
 
 onMounted(updateData)
 </script>
