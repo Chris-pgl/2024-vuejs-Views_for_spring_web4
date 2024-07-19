@@ -9,11 +9,12 @@
     <TheWelcome />
   </main>
   -->
-  console.log("Hello Pokie♥")
+  console.log("Hello Pookie♥")
 
   <a href="https://www.youtube.com/watch?v=m_qlgFQs7E4&list=RDUUH3sXYSMf0&index=2&ab_channel=MrSuicideSheep"> ꧁Stay chill ❧</a>
   
-  <a href="http://localhost:5173/ciccio">Vai da ciccio? 𓆲 </a> 
+  
+  <RouterLink to="/ciccio">Vai da ciccio? 𓆲</RouterLink>
   <!-- <a href="http://localhost:5173/about"> C'è anche about..☻</a>  -->
 
   <!-- Reindirizzamento verso la get all di Farmers -->
