@@ -1,5 +1,5 @@
 <template>
-   <div v-if="!newFarmShow" class="container">
+   <div v-if="!newFarmShow && !updateFarmShow" class="container">
       <h1>Farms:</h1>
       
         <!--Agiungo un bottone per fare un get add e un update alla pagina-->
@@ -10,14 +10,14 @@
         <ul class="farm-list" >
           <li v-for="(farm, ind) in farms" :key="farm.id" class="farm-item">
             [{{ ind + 1 }}] {{ farm.name }}: {{ farm.city }}
+            <br />
+            <button @click="editFarm(farm.id)">EDIT</button>
+            <button @click="deleteFarm(farm.id)">DELETE</button>
           </li>
         </ul>
-        <p v-if="saveResVis">
-          {{ saveRes }}
-        </p>
     </div>
 
-    <div v-else>
+    <div v-if="newFarmShow">
       <h1>New Farm🌿:</h1>
       <label>Name</label>
       <br />
@@ -30,6 +30,20 @@
       <button @click="toggleNewFarmShow">CANCEL</button>
       <button @click="saveNewFarm">SAVE</button>
     </div>
+
+    <div v-if="updateFarmShow">
+    <h1>Update Farm:</h1>
+    <label>Name</label>
+    <br />
+    <input type="text" v-model="updateFarmData.name" />
+    <br />
+    <label>City</label>
+    <br />
+    <input type="text" v-model="updateFarmData.city" />
+    <br />
+    <button @click="toggleUpdateFarmShow">CANCEL</button>
+    <button @click="updateFarm">SAVE</button>
+   </div>
 
     
      <RouterLink to="/"> Back to Home 🥀</RouterLink>
@@ -54,6 +68,10 @@ const saveRes = ref("")
 
 // eslint-disable-next-line no-unused-vars
 const newFarmShow = ref(false)
+
+const updateFarmShow = ref(false)
+
+const updateFarmData = ref({})
 
 // eslint-disable-next-line no-unused-vars
 const newFarmData = ref({
@@ -82,6 +100,11 @@ const toggleNewFarmShow = () => {
   console.log('newFarmShow:' + newFarmShow.value)
 }
 
+//update
+const toggleUpdateFarmShow = () => {
+  updateFarmShow.value = !updateFarmShow.value
+}
+
 //create
 const saveNewFarm = () => {
   axios.post("http://localhost:8080/farm/create", newFarmData.value)
@@ -101,28 +124,45 @@ const saveNewFarm = () => {
   })
 }
 
+const editFarm = (id) => {
+  for (let x = 0; x < farms.value.length; x++) {
+    const farm = farms.value[x]
+
+    if (farm.id === id) {
+      updateFarmData.value = farm
+      break
+    }
+  }
+  updateFarmShow.value = true
+}
+
+const updateFarm = () => {
+  const axiosData = {
+    name: updateFarmData.value.name,
+    city: updateFarmData.value.city
+    }
+
+    axios
+    .patch("http://localhost:8080/farm/update/" + updateFarmData.value.id, axiosData)
+    .then(() => {
+      updateData()
+      toggleUpdateFarmShow()()
+    })
+  }
+
+
+
+const deleteFarm = ( id )=> {
+  axios.delete("http://localhost:8080/farm/delete/" + id).then(() => {
+    farms.value = farms.value.filter((farm) => farm.id !== id) 
+  })
+}
 
 onMounted(() => {
   updateData()
 })
-
-/* Questa era una chiamata sola alla het all- Sopra abbiamo un add e get all 
-onMounted(() => {
-  axios
-    .get('http://localhost:8080/farm/all')
-    .then((res) => {
-      console.log(JSON.stringify(res.data, null, 2))
-
-      farms.value = res.data
-    })
-
-    // eslint-disable-next-line no-unused-vars
-    .catch((error) => {
-      console.log('error!!!!!!!!!')
-    })
-})
-*/
 </script>
+
 
 <style>
 .container {
